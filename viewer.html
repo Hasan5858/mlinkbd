@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieLinkBD Content Viewer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .section-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: bold;
+            color: #333;
+        }
+        .section-content {
+            padding: 20px;
+        }
+        .video-player {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 8px;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .url-list {
+            list-style: none;
+            padding: 0;
+        }
+        .url-list li {
+            background: #f8f9fa;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .url-list a {
+            color: #007bff;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .url-list a:hover {
+            text-decoration: underline;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .info-item .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 MovieLinkBD Content Viewer</h1>
+            <p>Scraped Content Analysis & Video Player</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-header">📊 Scraping Status</div>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="label">Status</div>
+                            <div class="value">
+                                <span class="status success">✅ Success</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">Content Length</div>
+                            <div class="value" id="contentLength">Loading...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">Page Type</div>
+                            <div class="value" id="pageType">Loading...</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label">Video URLs Found</div>
+                            <div class="value" id="videoCount">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">🎥 Video Player</div>
+                <div class="section-content">
+                    <p>If video content is found, it will be displayed here:</p>
+                    <div id="videoContainer">
+                        <p style="text-align: center; color: #666; padding: 40px;">
+                            No video player detected in the scraped content.<br>
+                            The content appears to be encoded/compressed data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">🔗 Extracted URLs</div>
+                <div class="section-content">
+                    <div id="urlsContainer">
+                        <p style="color: #666;">Loading URLs...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">📝 Raw Content Preview</div>
+                <div class="section-content">
+                    <div class="code-block" id="rawContent">
+                        Loading content...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load the scraped content and analysis
+        async function loadContent() {
+            try {
+                // Load analysis data
+                const analysisResponse = await fetch('final_movielinkbd_analysis.json');
+                const analysis = await analysisResponse.json();
+                
+                // Load raw content
+                const contentResponse = await fetch('final_movielinkbd_content.txt');
+                const content = await contentResponse.text();
+                
+                // Update UI with analysis data
+                document.getElementById('contentLength').textContent = analysis.content_length + ' chars';
+                document.getElementById('pageType').textContent = analysis.analysis.page_type || 'unknown';
+                document.getElementById('videoCount').textContent = analysis.analysis.video_info?.direct_video_urls?.length || 0;
+                
+                // Display URLs
+                const urlsContainer = document.getElementById('urlsContainer');
+                if (analysis.analysis.video_info?.direct_video_urls?.length > 0) {
+                    const urlList = document.createElement('ul');
+                    urlList.className = 'url-list';
+                    
+                    analysis.analysis.video_info.direct_video_urls.forEach(url => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.target = '_blank';
+                        a.textContent = url;
+                        li.appendChild(a);
+                        urlList.appendChild(li);
+                    });
+                    
+                    urlsContainer.innerHTML = '<h4>Direct Video URLs:</h4>';
+                    urlsContainer.appendChild(urlList);
+                } else {
+                    urlsContainer.innerHTML = '<p style="color: #666;">No video URLs found in the content.</p>';
+                }
+                
+                // Display raw content preview
+                document.getElementById('rawContent').textContent = content.substring(0, 2000) + 
+                    (content.length > 2000 ? '\n\n... (showing first 2000 characters)' : '');
+                
+                // Try to detect and display video player
+                displayVideoPlayer(content, analysis);
+                
+            } catch (error) {
+                console.error('Error loading content:', error);
+                document.getElementById('rawContent').textContent = 'Error loading content: ' + error.message;
+            }
+        }
+        
+        function displayVideoPlayer(content, analysis) {
+            const videoContainer = document.getElementById('videoContainer');
+            
+            // Check if we have video URLs
+            if (analysis.analysis.video_info?.direct_video_urls?.length > 0) {
+                const videoUrl = analysis.analysis.video_info.direct_video_urls[0];
+                
+                // Create video element
+                const video = document.createElement('video');
+                video.className = 'video-player';
+                video.controls = true;
+                video.src = videoUrl;
+                video.innerHTML = 'Your browser does not support the video tag.';
+                
+                videoContainer.innerHTML = '';
+                videoContainer.appendChild(video);
+                
+                // Add subtitle tracks if available
+                if (analysis.analysis.video_info.subtitles?.length > 0) {
+                    analysis.analysis.video_info.subtitles.forEach(subtitle => {
+                        const track = document.createElement('track');
+                        track.kind = 'subtitles';
+                        track.src = subtitle;
+                        track.label = 'Subtitle';
+                        track.srclang = 'en';
+                        track.default = true;
+                        video.appendChild(track);
+                    });
+                }
+            } else {
+                // Check for embed URLs
+                if (analysis.analysis.video_info?.embed_urls?.length > 0) {
+                    const embedUrl = analysis.analysis.video_info.embed_urls[0];
+                    const iframe = document.createElement('iframe');
+                    iframe.className = 'video-player';
+                    iframe.src = embedUrl;
+                    iframe.allowFullscreen = true;
+                    
+                    videoContainer.innerHTML = '';
+                    videoContainer.appendChild(iframe);
+                } else {
+                    // No video content found
+                    videoContainer.innerHTML = `
+                        <div style="text-align: center; color: #666; padding: 40px;">
+                            <h3>No Video Player Detected</h3>
+                            <p>The scraped content appears to be encoded/compressed data rather than a standard video page.</p>
+                            <p>This is likely due to the site's anti-bot protection system.</p>
+                            <div style="margin-top: 20px;">
+                                <strong>Content Analysis:</strong><br>
+                                • Page Type: ${analysis.analysis.page_type || 'unknown'}<br>
+                                • Script Type: ${analysis.analysis.script_type || 'unknown'}<br>
+                                • Is Anti-Bot Script: ${analysis.analysis.is_anti_bot_script ? 'Yes' : 'No'}<br>
+                                • Contains Video URLs: ${analysis.analysis.contains_video_urls ? 'Yes' : 'No'}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Load content when page loads
+        document.addEventListener('DOMContentLoaded', loadContent);
+    </script>
+</body>
+</html>

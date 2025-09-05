@@ -1,0 +1,23 @@
+{
+  "name": "movielinkbd-video-proxy-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for proxying MovieLinkBD video streams",
+  "main": "cloudflare-worker.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "tail": "wrangler tail"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "video",
+    "proxy",
+    "streaming"
+  ],
+  "author": "MovieLinkBD API",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

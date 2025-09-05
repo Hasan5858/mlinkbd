@@ -1,0 +1,62 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Development files
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+*_test.py
+analyze_*.py
+complete_*.py
+
+# Analysis files
+analye.txt
+analyze.txt
+
+# Cloudflare Worker files (separate deployment)
+cloudflare-worker.js
+wrangler.toml
+package-worker.json
+deploy_worker.sh
+
+# Local development files
+start_api.py
+test_api.py
+test_video_proxy.py
+test_cloudflare_worker.py
+
+# Documentation
+*.md
+!README.md
+
+# Git
+.git/
+.gitignore
+
+# Node modules (if any)
+node_modules/
+package-lock.json
+yarn.lock
